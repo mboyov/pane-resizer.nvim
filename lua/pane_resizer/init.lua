@@ -50,10 +50,26 @@ function M.setup(opts)
 		end,
 	})
 
-	-- Add toggle command
+	-- Toggle global enable/disable
 	api.nvim_create_user_command("PaneResizerToggle", function()
 		config.enabled = not config.enabled
 		vim.notify("Pane Resizer: " .. (config.enabled and "enabled" or "disabled"))
+	end, {})
+
+	-- Disable resize for current buffer and save width
+	api.nvim_create_user_command("PaneResizerDisable", function()
+		local win = api.nvim_get_current_win()
+		local buf = api.nvim_win_get_buf(win)
+		local width = api.nvim_win_get_width(win)
+		config.disabled_buffers[buf] = width
+		vim.notify("Pane Resizer: disabled for buffer " .. buf .. " (width = " .. width .. ")")
+	end, {})
+
+	-- Re-enable resize for current buffer
+	api.nvim_create_user_command("PaneResizerEnable", function()
+		local buf = api.nvim_get_current_buf()
+		config.disabled_buffers[buf] = nil
+		vim.notify("Pane Resizer: enabled for buffer " .. buf .. ")")
 	end, {})
 end
 

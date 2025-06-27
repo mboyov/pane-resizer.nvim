@@ -13,7 +13,7 @@ end
 
 -- Disables text wrapping for a given window
 function M.disable_wrap(win)
-	api.nvim_win_set_option(win, "wrap", false)
+	vim.wo[win].wrap = false
 end
 
 -- Determines if a window should be excluded from resizing (e.g., floating or special windows)
