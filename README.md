@@ -22,56 +22,83 @@
 
 ---
 
-Pane Resizer is a Neovim plugin that automates pane resizing to optimize workspace layouts. With Pane Resizer, you can keep specific windows like `NvimTree` at a fixed width, distribute space evenly among inactive panes, and configure custom resizing for the focused pane.
+# Pane Resizer
 
-## Features
+Pane Resizer is a Neovim plugin that dynamically resizes windows to optimize workspace layout. It focuses on enhancing your workflow by giving priority to the active pane, while preserving the width of excluded windows such as `NvimTree`, floating windows, or buffers you've explicitly disabled from resizing.
 
-- **Automatic Pane Resizing**: Automatically resizes the focused pane to a user-defined percentage.
-- **NvimTree Handling**: Keeps `NvimTree` at a fixed width, even when switching focus.
-- **Floating Windows Exclusion**: Ignores floating windows during pane resizing.
+## ✨ Features
 
-## Why use this?
+* **Smart Pane Resizing**: Automatically resizes the focused window to a user-defined percentage of available space.
+* **Fixed Width for NvimTree**: Keeps `NvimTree` at a constant width even when focus changes.
+* **Floating Window Exclusion**: Skips floating windows from layout calculations.
+* **Per-Buffer Resize Control**: Disable resizing for any buffer on demand while preserving its current width.
+* **Fully Configurable**: Customize widths, behavior, and activation dynamically.
 
-- **Efficiency**: Dynamically resize panes to enhance workflow by focusing on essential windows.
-- **Customization**: Offers flexible settings for the size of focused windows, `NvimTree`, and other panes.
-- **Compatibility**: Designed to work seamlessly with floating windows. 
+## 🚀 Why use this?
 
-## Installation & Configuration
+* 🧠 **Focus-centric layout**: Maintain a clean visual hierarchy by resizing only what matters.
+* ⚙️ **Custom per-buffer behavior**: Need a terminal or outline to keep its size? No problem.
+* �� **Floating support**: Avoid breaking UI popups like Telescope or LSP dialogs.
+* 🧩 **Plug-and-play**: Minimal setup and works out of the box with most setups.
 
-### 1. Installation
+---
 
-Using your preferred plugin manager:
+## 📦 Installation & Configuration
+
+### Using Lazy.nvim:
 
 ```lua
--- Using LazyVim
-return {
-  {
-    "mboyov/pane-resizer.nvim",
-    config = function()
-      require('pane_resizer').setup({
-        NVIMTREE_WIDTH = 40,              -- Set NvimTree width (default is 30)
-        FOCUSED_WIDTH_PERCENTAGE = 0.5,   -- Resize focused window to 50% (default is 60%)
-      })
-    end,
-  },
+-- Lazy setup
+{
+  "mboyov/pane-resizer.nvim",
+  config = function()
+    require("pane_resizer").setup({
+      NVIMTREE_WIDTH = 40,             -- Optional: fixed width for NvimTree (default: 30)
+      FOCUSED_WIDTH_PERCENTAGE = 0.6,  -- Optional: focused window width (default: 0.7)
+    })
+  end,
 }
 ```
 
-### 2. **Use Cases**:
+---
 
-- Users who work with multiple splits and need a focused window to occupy a larger portion of the screen.
-- Users who want to keep NvimTree at a fixed width.
-- Users who use floating windows and want them excluded from the resizing logic. 
+## 🛠️ Commands
 
-## Contributing
-Feel free to open issues or pull requests if you have suggestions for improvements.
+| Command               | Description                                                           |
+| --------------------- | --------------------------------------------------------------------- |
+| `:PaneResizerToggle`  | Enable or disable automatic resizing globally.                        |
+| `:PaneResizerDisable` | Disable resizing for the current buffer and freeze its current width. |
+| `:PaneResizerEnable`  | Re-enable resizing for the current buffer.                            |
 
-## License
-Distributed under the MIT License. See LICENSE for more information.
+---
 
-## Credits
-- [Neovim ](https://neovim.io) for creating an extensible editor that makes plugins like this possible.
-- Thanks to the Neovim community for their valuable resources and examples.
+## 📌 Use Cases
+
+* Developers using multiple vertical splits who want the focused pane to be emphasized.
+* Users with sidebars (e.g., `NvimTree`, `Outline`, `Trouble`) who want consistent widths.
+* Terminal lovers who want their REPL pane to keep its size during window navigation.
+* Tinkerers looking for full control over window layout behavior.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open an issue or submit a pull request to improve functionality or performance.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more details.
+
+---
+
+## 🙌 Credits
+
+* [Neovim](https://neovim.io) for building an editor made to be extended.
+* The amazing Neovim community for their plugins, examples, and ideas.
+
+---
 
 [contributors-shield]: https://img.shields.io/github/contributors/mboyov/pane-resizer.nvim.svg?style=for-the-badge
 [contributors-url]: https://github.com/mboyov/pane-resizer.nvim/graphs/contributors
