@@ -49,6 +49,12 @@ function M.setup(opts)
 			end
 		end,
 	})
+
+	-- Add toggle command
+	api.nvim_create_user_command("PaneResizerToggle", function()
+		config.enabled = not config.enabled
+		vim.notify("Pane Resizer: " .. (config.enabled and "enabled" or "disabled"))
+	end, {})
 end
 
 return M
