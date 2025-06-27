@@ -1,5 +1,5 @@
 -- resize.lua
--- Contains the main logic for resizing Neovim panes based on focus and configuration settings
+-- Contains the core logic for resizing Neovim panes based on focus and configuration
 
 local api = vim.api
 local config = require("pane_resizer.config")
@@ -7,43 +7,67 @@ local utils = require("pane_resizer.utils")
 
 local M = {}
 
--- Main function to resize only the focused window, enforcing fixed width for NvimTree
+-- Main function: resizes only the focused window,
+-- while preserving fixed widths for excluded or disabled panes
 function M.resize_focused_pane()
-	local current_win = api.nvim_get_current_win()
+	if not config.enabled then
+		return
+	end
 
-	-- Skip resizing for floating windows
+	local current_win = api.nvim_get_current_win()
 	if utils.should_exclude_window(current_win) then
 		return
 	end
 
-	local total_width = api.nvim_get_option("columns")
-	local nvimtree_win = nil
+	local all_wins = api.nvim_tabpage_list_wins(0)
+	local resizable_wins = {}
+	local width_fixed = 0
 
-	-- Identify NvimTree and filter out floating windows
-	for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
-		if utils.is_buffer_name(win, "NvimTree_") then
-			nvimtree_win = win
-			break
+	for _, win in ipairs(all_wins) do
+		if utils.should_exclude_window(win) then
+			goto continue
 		end
+
+		local buf = api.nvim_win_get_buf(win)
+
+		-- Fixed width for NvimTree
+		if utils.is_buffer_name(win, "NvimTree_") then
+			api.nvim_win_set_width(win, config.NVIMTREE_WIDTH)
+			width_fixed = width_fixed + config.NVIMTREE_WIDTH
+			goto continue
+		end
+
+		-- Disabled buffers: apply saved width and exclude from layout
+		local disabled_width = config.disabled_buffers[buf]
+		if disabled_width then
+			api.nvim_win_set_width(win, disabled_width)
+			width_fixed = width_fixed + disabled_width
+			goto continue
+		end
+
+		table.insert(resizable_wins, win)
+		::continue::
 	end
 
-	-- Skip resizing if NvimTree is focused or if there are no other windows
-	if current_win == nvimtree_win or #api.nvim_tabpage_list_wins(0) < 2 then
+	local current_buf = api.nvim_win_get_buf(current_win)
+
+	-- If the focused buffer is disabled, no resize should be applied
+	if config.disabled_buffers[current_buf] then
 		return
 	end
 
-	-- Deduct NvimTree width from the total if it's present
-	if nvimtree_win then
-		total_width = total_width - config.NVIMTREE_WIDTH
-	end
+	local total_width = vim.o.columns
+	local remaining_width = total_width - width_fixed
 
-	-- Calculate and set the width for the focused window only
-	local focused_width = math.floor(total_width * config.FOCUSED_WIDTH_PERCENTAGE)
-	api.nvim_win_set_width(current_win, focused_width)
+	local focused_width = math.floor(remaining_width * config.FOCUSED_WIDTH_PERCENTAGE)
+	local other_width = math.floor((remaining_width - focused_width) / math.max(#resizable_wins - 1, 1))
 
-	-- Enforce fixed width for NvimTree
-	if nvimtree_win then
-		api.nvim_win_set_width(nvimtree_win, config.NVIMTREE_WIDTH)
+	for _, win in ipairs(resizable_wins) do
+		if win == current_win then
+			api.nvim_win_set_width(win, focused_width)
+		else
+			api.nvim_win_set_width(win, other_width)
+		end
 	end
 end
 
