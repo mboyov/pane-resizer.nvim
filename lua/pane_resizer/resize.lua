@@ -10,6 +10,7 @@ local M = {}
 -- Main function: resizes only the focused window,
 -- while preserving fixed widths for excluded or disabled panes
 function M.resize_focused_pane()
+	-- Check if resizing is globally enabled
 	if not config.enabled then
 		return
 	end
